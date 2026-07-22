@@ -46,6 +46,18 @@ app.get('/health', (req, res) => {
 });
 
 // Routes
+app.get('/api', (_req, res) => {
+  res.json({
+    name: 'Kahoot Builder Online API',
+    status: 'ok',
+    version: '1.0.0',
+    endpoints: {
+      auth: '/api/auth',
+      questions: '/api/questions',
+      sessions: '/api/sessions'
+    }
+  });
+});
 app.use('/api/auth', authRoutes);
 app.use('/api', questionRoutes);
 
