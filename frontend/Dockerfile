@@ -4,12 +4,12 @@ ENV APP_BASE_PATH=$APP_BASE_PATH
 ENV VITE_API_PATH=$APP_BASE_PATH/api
 COPY . /app
 WORKDIR /app
-RUN npm ci
+RUN npm install
 
 FROM node:24-alpine AS production-dependencies-env
 COPY ./package.json package-lock.json /app/
 WORKDIR /app
-RUN npm ci --omit=dev
+RUN npm install --omit=dev
 
 FROM node:24-alpine AS build-env
 ARG APP_BASE_PATH=/kahoot-builder
