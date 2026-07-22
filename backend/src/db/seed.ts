@@ -131,7 +131,7 @@ function seed(db: Database.Database) {
     authSessions.push({
       id: generateUuid(),
       user_id: users[i].id,
-      refresh_token_hash: crypto.createHash('sha256', `refresh-token-user-${i}-123`).digest('hex'),
+      refresh_token_hash: crypto.createHash('sha256').update(`refresh-token-user-${i}-123`).digest('hex'),
       expires_at: dateTime(new Date('2026-08-20T14:22:00Z')),
     });
   }
