@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+  /* Core Colors */
+  --color-text: #17151f;
+  --color-background: #f8f8fc;
+  --color-primary: #635bff;
+  --color-secondary: #a8a3ff;
+  --color-accent: #e879a8;
+  --color-ink: #1d1b2a;
+  
+  /* Semantic Tokens */
+  --color-success: #059669;
+  --color-success-foreground: #ffffff;
+  --color-warning: #d97706;
+  --color-warning-foreground: #ffffff;
+  --color-danger: #dc2626;
+  --color-danger-foreground: #ffffff;
+  --color-info: #2563eb;
+  --color-info-foreground: #ffffff;
+  --color-muted: #e5e0eb;
+  --color-muted-foreground: #6b6573;
+  --color-border: #d9d2e3;
+  --color-input: #ffffff;
+  --color-ring: #8650b9;
+  --color-card: #ffffff;
+  --color-card-foreground: #0c0a0f;
+  --color-popover: #ffffff;
+  --color-popover-foreground: #0c0a0f;
+  --color-foreground: #0c0a0f;
+}
+
+html.dark,
+[data-theme="dark"] {
+  --color-text: #f2f0f5;
+  --color-background: #0a070d;
+  --color-primary: #7c46af;
+  --color-secondary: #452069;
+  --color-accent: #5b1f93;
+  --color-success: #10b981;
+  --color-success-foreground: #000000;
+  --color-warning: #f59e0b;
+  --color-warning-foreground: #000000;
+  --color-danger: #ef4444;
+  --color-danger-foreground: #000000;
+  --color-info: #3b82f6;
+  --color-info-foreground: #000000;
+  --color-muted: #1f1a26;
+  --color-muted-foreground: #a8a0b3;
+  --color-border: #2f2938;
+  --color-input: #16121c;
+  --color-ring: #7c46af;
+  --color-card: #16121c;
+  --color-card-foreground: #f2f0f5;
+  --color-popover: #16121c;
+  --color-popover-foreground: #f2f0f5;
+  --color-foreground: #f2f0f5;
+}
+
+html,
+body {
+  @apply bg-background text-foreground;
+  color-scheme: light;
+  min-width: 320px;
+}
+
+button, a, input, textarea, select { transition-duration: 160ms; }
+
+html.dark,
+[data-theme="dark"] {
+  color-scheme: dark;
+}
