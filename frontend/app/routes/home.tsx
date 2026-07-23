@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router';
-import { ArrowRight, FileSpreadsheet, Layers3, Sparkles, UsersRound } from 'lucide-react';
+import { ArrowRight, FileSpreadsheet, Sparkles, UsersRound } from 'lucide-react';
 import { toast } from 'sonner';
 import { kahootService } from '../services/api/kahoot.service.js';
 import { useAuth } from '../hooks/useAuth.js';
 import { useTranslation } from 'react-i18next';
+import logo from '../assets/logo_kb.svg';
 
 export function meta() {
   const { t } = useTranslation('common');
@@ -58,7 +59,6 @@ export default function Home() {
       <div className="mx-auto max-w-7xl px-5 py-6 sm:px-8">
         <header className="flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 text-foreground">
-            <span className="grid size-10 place-items-center rounded-2xl bg-primary text-white shadow-lg shadow-primary/20"><Layers3 size={21} /></span>
             <span className="text-base font-black leading-tight tracking-tight sm:text-lg">{t('app.name')}</span>
           </Link>
           {user ? <nav className="flex items-center gap-0 sm:gap-1"><Link to="/sessions" className="rounded-full px-2 py-2 text-xs font-semibold leading-tight text-muted-foreground hover:bg-muted hover:text-foreground sm:px-4 sm:text-sm"><span className="sm:hidden">{t('home.sessions')}</span><span className="hidden sm:inline">{t('home.my_sessions')}</span></Link><Link to="/profile" className="rounded-full px-2 py-2 text-xs font-semibold leading-tight text-muted-foreground hover:bg-muted hover:text-foreground sm:px-4 sm:text-sm"><span className="sm:hidden">{t('home.account')}</span><span className="hidden sm:inline">{t('home.go_to_my_account')}</span></Link></nav> : <Link to="/login" className="rounded-full px-3 py-2 text-sm font-semibold text-muted-foreground hover:bg-muted hover:text-foreground">{t('home.access')}</Link>}
