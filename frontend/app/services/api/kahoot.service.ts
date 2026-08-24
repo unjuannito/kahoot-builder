@@ -11,6 +11,8 @@ export const kahootService = {
   updateQuestion: (id: string, input: UpdateQuestionInput) => apiService.put<Question>(`/questions/${encodeURIComponent(id)}`, input),
   deleteQuestion: (id: string) => apiService.delete(`/questions/${encodeURIComponent(id)}`),
   updateSessionVisibility: (code: string, visibility: SessionVisibility) => apiService.put<KahootSession>(`/sessions/${encodeURIComponent(code)}/visibility`, { visibility }),
+  closeSession: (code: string) => apiService.put<KahootSession>(`/sessions/${encodeURIComponent(code)}/close`, {}),
+  reopenSession: (code: string) => apiService.put<KahootSession>(`/sessions/${encodeURIComponent(code)}/reopen`, {}),
   joinSession: (code: string) => apiService.post(`/sessions/${encodeURIComponent(code)}/join`),
   leaveSession: (code: string) => apiService.post(`/sessions/${encodeURIComponent(code)}/leave`),
   async exportSession(code: string): Promise<void> {

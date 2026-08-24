@@ -16,13 +16,13 @@ export function meta({ params }: { params: { code?: string } }) {
 
 function QuestionCard({ question, index, t, onDelete, onEdit, isOwner }: { question: Question; index: number; t: (key: string) => string; onDelete: (id: string) => void; onEdit: (question: Question) => void; isOwner: boolean }) {
   return (
-    <article className="rounded-2xl border border-border bg-card p-4 shadow-sm">
-      <div className="flex items-start justify-between gap-3">
+    <article className="min-w-0 max-w-full overflow-hidden rounded-2xl border border-border bg-card p-4 shadow-sm">
+      <div className="flex min-w-0 items-start justify-between gap-3">
         <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-primary/10 text-xs font-black text-primary">
           {String(index + 1).padStart(2, '0')}
         </span>
-        <p className="flex-1 text-sm font-bold leading-5">{question.question}</p>
-        <div className="flex items-center gap-2">
+        <p className="min-w-0 flex-1 break-all text-sm font-bold leading-5">{question.question}</p>
+        <div className="flex shrink-0 items-center gap-2">
           <span className="text-xs font-bold text-muted-foreground">{question.time}s</span>
           {isOwner && (
             <div className="flex gap-1">
@@ -44,8 +44,8 @@ function QuestionCard({ question, index, t, onDelete, onEdit, isOwner }: { quest
           )}
         </div>
       </div>
-      <div className="flex items-center justify-between mt-3 pl-10">
-        <p className="truncate text-xs text-muted-foreground">
+      <div className="flex min-w-0 items-start justify-between gap-2 mt-3 pl-10">
+        <p className="min-w-0 break-all text-xs text-muted-foreground">
           {t('session.correct_answer_label')}: {question.correct.split(',').map((item) => question[`option${item}` as keyof Question]).join(', ')}
         </p>
         {question.user_name && <p className="text-xs text-muted-foreground font-semibold">({question.user_name})</p>}
@@ -74,7 +74,17 @@ export default function Session() {
 
   useEffect(() => {
     if (isAuthLoading || !user) return;
-    Promise.all([kahootService.getSession(code), kahootService.joinSession(code), kahootService.getSessionQuestions(code)]).then(([fetchedSession, , sessionQuestions]) => { setSession(fetchedSession); setSessionId(fetchedSession.id); sessionStorage.setItem(`kahoot-session:${code}`, fetchedSession.id); setQuestions(sessionQuestions); }).catch((error) => toast.error(error.message ?? t('session.error_room_not_found'))).finally(() => setLoading(false));
+    (async () => {
+      await kahootService.joinSession(code);
+      const [fetchedSession, sessionQuestions] = await Promise.all([
+        kahootService.getSession(code),
+        kahootService.getSessionQuestions(code),
+      ]);
+      setSession(fetchedSession);
+      setSessionId(fetchedSession.id);
+      sessionStorage.setItem(`kahoot-session:${code}`, fetchedSession.id);
+      setQuestions(sessionQuestions);
+    })().catch((error) => toast.error(error.message ?? t('session.error_room_not_found'))).finally(() => setLoading(false));
   }, [code, isAuthLoading, user, t]);
 
   useEffect(() => {
@@ -165,6 +175,28 @@ export default function Session() {
     }
   };
 
+  const closeSession = async () => {
+    if (!session?.is_owner || !confirm(t('session.confirm_close'))) return;
+    try {
+      const updated = await kahootService.closeSession(code);
+      setSession(updated);
+      toast.success(t('session.session_closed'));
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : t('session.error_close'));
+    }
+  };
+
+  const reopenSession = async () => {
+    if (!session?.is_owner) return;
+    try {
+      const updated = await kahootService.reopenSession(code);
+      setSession(updated);
+      toast.success(t('session.session_reopened'));
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : t('session.error_reopen'));
+    }
+  };
+
   const groups = useMemo(() => {
     if (!grouped) return null;
     const entries = Object.entries(questions.reduce<Record<string, Question[]>>((result, question) => {
@@ -181,6 +213,8 @@ export default function Session() {
 
   if (isAuthLoading || !user) return <main className="grid min-h-screen place-items-center bg-background p-6"><p className="text-muted-foreground">{t('session.checking_account')}</p></main>;
   if (!sessionId && !loading) return <main className="grid min-h-screen place-items-center bg-background p-6"><div className="max-w-md rounded-3xl border border-border bg-card p-8 text-center shadow-xl"><div className="mx-auto mb-5 grid size-14 place-items-center rounded-2xl bg-primary/10 text-primary"><UsersRound /></div><h1 className="text-2xl font-black">{t('session.room_not_found_title')}</h1><p className="mt-3 text-muted-foreground">{t('session.room_not_found_description')}</p><Link to="/" className="mt-7 inline-block w-full rounded-2xl bg-primary py-3 font-bold text-white">{t('session.back_home')}</Link></div></main>;
+
+  const isClosed = Boolean(session?.closed_at);
 
   return <main className="min-h-screen bg-background flex flex-col lg:h-screen">
     <header className="border-b border-border bg-card/80 backdrop-blur shrink-0">
@@ -206,8 +240,9 @@ export default function Session() {
         </div>
       </div>
     </header>
-    <div className="mx-auto grid max-w-7xl gap-8 px-5 py-6 sm:px-8 sm:py-8 lg:grid-cols-[1.1fr_.9fr] lg:flex-1 lg:min-h-0 w-full">
-      <section className="overflow-visible lg:min-h-0 lg:overflow-auto">
+    {isClosed && <div className="mx-auto mt-5 w-full max-w-7xl px-5 sm:px-8"><div className="flex flex-col gap-3 rounded-2xl border border-primary/25 bg-primary/5 p-4 sm:flex-row sm:items-center sm:justify-between"><div><p className="font-black text-primary">{t('session.session_closed_label')}</p><p className="mt-1 text-sm text-muted-foreground">{t('session.session_closed_description')}</p></div>{session?.is_owner && <button onClick={reopenSession} className="inline-flex shrink-0 items-center justify-center rounded-xl border border-primary/30 px-4 py-2.5 text-sm font-bold text-primary hover:bg-primary/10">{t('session.reopen_session')}</button>}</div></div>}
+    <div className={`mx-auto grid min-w-0 max-w-7xl gap-8 px-5 py-6 sm:px-8 sm:py-8 ${isClosed ? 'lg:grid-cols-1' : 'lg:grid-cols-[1.1fr_.9fr]'} lg:flex-1 lg:min-h-0 w-full`}>
+      {!isClosed && <section className="min-w-0 overflow-visible lg:min-h-0 lg:overflow-auto">
         {editingQuestion ? (
           <div className="rounded-3xl border border-border bg-card p-5 shadow-sm sm:p-7">
             <div className="flex items-center justify-between mb-6">
@@ -256,11 +291,11 @@ export default function Session() {
             </div>
             <form onSubmit={submit} className="rounded-3xl border border-border bg-card p-5 shadow-sm sm:p-7">
               <label className="text-sm font-bold">{t('session.question_label')} <span className="font-normal text-muted-foreground">({form.question.length}/120)</span></label>
-              <textarea value={form.question} maxLength={120} onChange={(e) => update('question', e.target.value)} placeholder={t('session.question_placeholder')} className="mt-2 min-h-28 w-full resize-none rounded-2xl border border-border bg-input p-4 text-lg font-semibold outline-none ring-primary focus:ring-2" />
+              <textarea disabled={Boolean(session?.closed_at)} value={form.question} maxLength={120} onChange={(e) => update('question', e.target.value)} placeholder={t('session.question_placeholder')} className="mt-2 min-h-28 w-full resize-none rounded-2xl border border-border bg-input p-4 text-lg font-semibold outline-none ring-primary focus:ring-2 disabled:cursor-not-allowed disabled:opacity-60" />
               <div className="mt-6 grid gap-3 sm:grid-cols-2">
                 {[1, 2, 3, 4].map((index) => (
                   <div key={index} className={`relative rounded-2xl border-2 p-3 transition ${selected.includes(index) ? 'border-primary bg-primary/5' : 'border-border'}`}>
-                    <input value={form[`option${index}` as keyof typeof blank] as string} onChange={(e) => update(`option${index}` as keyof typeof blank, e.target.value)} maxLength={75} placeholder={`${t('session.option_placeholder')} ${String.fromCharCode(64 + index)}`} className="w-full bg-transparent pr-9 text-sm font-semibold outline-none" />
+                    <input disabled={Boolean(session?.closed_at)} value={form[`option${index}` as keyof typeof blank] as string} onChange={(e) => update(`option${index}` as keyof typeof blank, e.target.value)} maxLength={75} placeholder={`${t('session.option_placeholder')} ${String.fromCharCode(64 + index)}`} className="w-full min-w-0 bg-transparent pr-9 text-sm font-semibold outline-none" />
                     <button type="button" onClick={() => toggleCorrect(index)} className={`absolute right-3 top-3 grid size-5 place-items-center rounded-full border ${selected.includes(index) ? 'border-primary bg-primary text-white' : 'border-border text-transparent'}`} aria-label={`${t('session.question_label')} ${index}`}>
                       <Check size={13} />
                     </button>
@@ -274,22 +309,22 @@ export default function Session() {
                     {KAHOOT_TIMES.map((time) => <option key={time} value={time}>{time}s</option>)}
                   </select>
                 </label>
-                <button disabled={!canSubmit || saving} className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white hover:bg-primary/90 disabled:opacity-50">
+                <button disabled={!canSubmit || saving || Boolean(session?.closed_at)} className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white hover:bg-primary/90 disabled:opacity-50">
                   {saving ? <LoaderCircle className="animate-spin" size={17} /> : <Plus size={17} />} {t('session.add_question')}
                 </button>
               </div>
             </form>
           </>
         )}
-      </section>
-      <aside className="flex flex-col lg:min-h-0">
+      </section>}
+      <aside className="flex min-w-0 flex-col lg:min-h-0">
         <div className="mb-4 flex items-end justify-between shrink-0">
           <div>
             <p className="text-sm font-bold text-muted-foreground">{t('session.questions_collected')}</p>
             <p className="text-3xl font-black">{loading ? t('session.loading') : questions.length}</p>
           </div>
-          <div className="flex items-center gap-1 text-sm font-semibold text-muted-foreground">
-            <UsersRound size={16} /> {t('session.room_open')}
+          <div className="flex flex-wrap items-center justify-end gap-2 text-sm font-semibold text-muted-foreground">
+            {!isClosed && <><span className="inline-flex items-center gap-1"><UsersRound size={16} /> {t('session.room_open')}</span>{session?.is_owner && <button onClick={closeSession} className="rounded-xl border border-red-200 px-3 py-2 text-xs font-bold text-red-600 hover:bg-red-50">{t('session.close_session')}</button>}</>}
           </div>
         </div>
 
@@ -361,7 +396,7 @@ export default function Session() {
                 return question.user_id === user?.id;
               });
               return [
-                <div key={`group-${name}`} className="overflow-hidden rounded-2xl border border-border bg-card">
+                <div key={`group-${name}`} className="min-w-0 max-w-full overflow-hidden rounded-2xl border border-border bg-card">
                   <button
                     onClick={() => canExpand && setOpenGroups((current) => ({ ...current, [name]: !isOpen }))}
                     className={`flex w-full items-center justify-between p-4 text-left font-black ${canExpand ? 'cursor-pointer' : 'cursor-default'}`}
@@ -370,7 +405,7 @@ export default function Session() {
                     {canExpand && <ChevronDown size={17} className={isOpen ? 'rotate-180' : ''} />}
                   </button>
                   {canExpand && isOpen && (
-                    <div className="space-y-3 border-t border-border p-3">
+                    <div className="min-w-0 space-y-3 border-t border-border p-3">
                       {visibleQuestions.map((question) => (
                         <QuestionCard
                           key={question.id}
@@ -379,7 +414,7 @@ export default function Session() {
                           t={t}
                           onDelete={deleteQuestion}
                           onEdit={startEdit}
-                          isOwner={question.user_id === user?.id}
+                          isOwner={!isClosed && question.user_id === user?.id}
                         />
                       ))}
                     </div>
@@ -407,7 +442,7 @@ export default function Session() {
                     t={t}
                     onDelete={deleteQuestion}
                     onEdit={startEdit}
-                    isOwner={question.user_id === user?.id}
+                    isOwner={!isClosed && question.user_id === user?.id}
                   />
                 ))}
               {(
