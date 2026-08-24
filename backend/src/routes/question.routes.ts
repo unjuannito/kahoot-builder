@@ -18,6 +18,8 @@ router.post('/questions', validateRequest(createQuestionSchema), KahootControlle
 router.put('/questions/:id', validateRequest({ params: questionIdParamSchema, body: updateQuestionSchema }), KahootController.updateQuestion);
 router.delete('/questions/:id', validateRequest({ params: questionIdParamSchema }), KahootController.deleteQuestion);
 router.put('/sessions/:code/visibility', KahootController.updateVisibility);
+router.put('/sessions/:code/close', KahootController.closeSession);
+router.put('/sessions/:code/reopen', KahootController.reopenSession);
 router.get('/sessions/:code/export-kahoot', KahootController.exportKahoot);
 router.post('/sessions/:code/join', KahootController.joinSession);
 router.post('/sessions/:code/leave', KahootController.leaveSession);
