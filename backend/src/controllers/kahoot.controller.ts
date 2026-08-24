@@ -37,13 +37,32 @@ export const KahootController = {
     const session = KahootRepository.findSessionById(req.body.session_id);
     if (!session) return res.status(404).json({ error: 'Session not found' });
     if (isSessionExpired(session)) return res.status(404).json({ error: 'Session not found' });
+    if (session.closed_at) return res.status(409).json({ error: 'Session is closed' });
     res.status(201).json(KahootRepository.createQuestion({ ...req.body, user_id: req.user.userId }));
+  },
+
+  closeSession(req: any, res: Response) {
+    const session = getSession(req.params.code);
+    if (!session) return res.status(404).json({ error: 'Session not found' });
+    const sessionUser = KahootRepository.findSessionUser(session.id, req.user.userId);
+    if (!sessionUser?.is_owner) return res.status(403).json({ error: 'Only owner can close the session' });
+    res.json({ ...KahootRepository.closeSession(session.id), is_owner: sessionUser.is_owner });
+  },
+
+  reopenSession(req: any, res: Response) {
+    const session = getSession(req.params.code);
+    if (!session) return res.status(404).json({ error: 'Session not found' });
+    const sessionUser = KahootRepository.findSessionUser(session.id, req.user.userId);
+    if (!sessionUser?.is_owner) return res.status(403).json({ error: 'Only owner can reopen the session' });
+    res.json({ ...KahootRepository.reopenSession(session.id), is_owner: sessionUser.is_owner });
   },
 
   updateQuestion(req: any, res: Response) {
     const questionId = req.params.id;
     const question = KahootRepository.findQuestionById(questionId);
     if (!question) return res.status(404).json({ error: 'Question not found' });
+    const session = KahootRepository.findSessionById(question.session_id);
+    if (session?.closed_at) return res.status(409).json({ error: 'Session is closed' });
     if (question.user_id !== req.user.userId) return res.status(403).json({ error: 'You can only edit your own questions' });
     const updatedQuestion = KahootRepository.updateQuestion(questionId, req.body);
     res.json(updatedQuestion);
@@ -53,6 +72,8 @@ export const KahootController = {
     const questionId = req.params.id;
     const question = KahootRepository.findQuestionById(questionId);
     if (!question) return res.status(404).json({ error: 'Question not found' });
+    const session = KahootRepository.findSessionById(question.session_id);
+    if (session?.closed_at) return res.status(409).json({ error: 'Session is closed' });
     if (question.user_id !== req.user.userId) return res.status(403).json({ error: 'You can only delete your own questions' });
     KahootRepository.deleteQuestion(questionId);
     res.status(204).send();

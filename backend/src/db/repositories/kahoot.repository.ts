@@ -35,6 +35,16 @@ export const KahootRepository = {
     return this.findSessionById(sessionId)!;
   },
 
+  closeSession(sessionId: string): KahootSession {
+    getDB().prepare('UPDATE sessions SET closed_at = CURRENT_TIMESTAMP WHERE id = ?').run(sessionId);
+    return this.findSessionById(sessionId)!;
+  },
+
+  reopenSession(sessionId: string): KahootSession {
+    getDB().prepare('UPDATE sessions SET closed_at = NULL WHERE id = ?').run(sessionId);
+    return this.findSessionById(sessionId)!;
+  },
+
   findSessionById(id: string): KahootSession | undefined {
     return getDB().prepare('SELECT * FROM sessions WHERE id = ?').get(id) as KahootSession | undefined;
   },

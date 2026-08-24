@@ -10,6 +10,7 @@ import { Toaster } from "sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import logo from './assets/logo_kb.svg';
 
 import type { Route } from "./+types/root";
 import "./app.css";
@@ -63,6 +64,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href={logo} type="image/svg+xml" />
+        <link rel="shortcut icon" href={logo} />
         <Meta />
         <Links />
         <script

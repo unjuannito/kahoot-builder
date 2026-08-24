@@ -8,6 +8,7 @@ export interface KahootSession {
   visibility: SessionVisibility;
   created_at: string;
   expires_at?: string;
+  closed_at?: string;
   is_owner?: boolean;
   joined_at?: string;
 }
