@@ -50,7 +50,8 @@ CREATE TABLE IF NOT EXISTS sessions (
   code TEXT UNIQUE NOT NULL,
   visibility TEXT DEFAULT 'all_questions' NOT NULL, -- 'all_questions' | 'only_own'
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  expires_at DATETIME
+  expires_at DATETIME,
+  closed_at DATETIME
 );
 
 CREATE TABLE IF NOT EXISTS questions (
