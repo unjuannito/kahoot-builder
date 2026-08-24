@@ -6,6 +6,7 @@ import { useAuth } from '../hooks/useAuth.js';
 import { kahootService } from '../services/api/kahoot.service.js';
 import type { KahootSession } from '../types/kahoot.types.js';
 import { useTranslation } from 'react-i18next';
+import logo from '../assets/logo_kb.svg';
 
 export function meta() {
   const { t } = useTranslation('common');
@@ -40,7 +41,7 @@ export default function Sessions() {
       <p className="mt-2 text-muted-foreground">{t('sessions.description')}</p></div>
     {!sessions.length ?
       <div className="mt-8 rounded-3xl border border-dashed border-border p-12 text-center">
-        <img src="/logo_kb.svg" alt={t('app.name')} className="mx-auto h-12 w-auto" />
+        <img src={logo} alt={t('app.name')} className="mx-auto h-12 w-auto" />
         <p className="mt-4 font-bold">{t('sessions.no_sessions_title')}</p>
         <Link to="/" className="mt-5 inline-block rounded-xl bg-primary px-5 py-3 font-bold text-white">{t('sessions.create_or_join')}</Link>
       </div>
@@ -50,7 +51,7 @@ export default function Sessions() {
           <div key={session.id} className="rounded-3xl border border-border bg-card p-5 shadow-sm transition hover:-translate-y-1 hover:border-primary">
             <Link to={`/session/${session.code}`}>
             <div className="flex items-center justify-between">
-              <span className="grid size-11 place-items-center rounded-2xl bg-primary/10 text-primary"><img src="/logo_kb.svg" alt={t('app.name')} className="h-6 w-auto" /></span>
+              <span className="grid size-11 place-items-center rounded-2xl bg-primary/10 text-primary"><img src={logo} alt={t('app.name')} className="h-6 w-auto" /></span>
               <span className="text-xs font-bold text-muted-foreground">{session.is_owner ? t('sessions.owner') : t('sessions.participant')}</span>
             </div>
             <p className="mt-6 text-2xl font-black tracking-widest text-primary">{session.code}</p>
