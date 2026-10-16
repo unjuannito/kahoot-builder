@@ -1,0 +1,8 @@
+.git
+.codex
+.agents
+data
+backend/node_modules
+frontend/node_modules
+backend/database.sqlite
+*.log

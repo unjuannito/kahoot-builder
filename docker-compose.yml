@@ -1,0 +1,18 @@
+services:
+  kahoot-builder:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP_BASE_PATH: ${APP_BASE_PATH:-/}
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-50541}:3000"
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DB_PATH: /app/data/database.sqlite
+    volumes:
+      - ./data:/app/data:Z

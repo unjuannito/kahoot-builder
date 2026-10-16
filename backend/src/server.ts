@@ -1,4 +1,4 @@
-import app from './app.js';
+import app, { attachFrontend } from './app.js';
 import { config } from './config/index.js';
 import { initDB } from './db/index.js';
 import { AccountDeletionService } from './services/account-deletion.service.js';
@@ -12,6 +12,7 @@ const startServer = async () => {
     setInterval(() => AccountDeletionService.processDue(), 60 * 60 * 1000);
     SessionCleanupService.processDue();
     setInterval(() => SessionCleanupService.processDue(), 60 * 60 * 1000);
+    await attachFrontend();
     console.log('📦 Database initialized');
 
     app.listen(config.port, '0.0.0.0', () => {

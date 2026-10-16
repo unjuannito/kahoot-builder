@@ -8,6 +8,10 @@ import authRoutes from './routes/auth.routes.js';
 import questionRoutes from './routes/question.routes.js';
 import { errorHandler } from './middleware/error.handler.js';
 import { apiRateLimiter } from './middleware/rate-limiter.js';
+import path from 'path';
+import { pathToFileURL } from 'url';
+import { existsSync } from 'fs';
+import { createRequestHandler } from '@react-router/express';
 
 const app = express();
 
@@ -60,6 +64,26 @@ app.get('/api', (_req, res) => {
 });
 app.use('/api/auth', authRoutes);
 app.use('/api', questionRoutes);
+
+// React Router's production build is the frontend server. The API and SSR
+// frontend intentionally share this Express instance and public port.
+export const attachFrontend = async () => {
+  const frontendBuildDir = process.env.FRONTEND_BUILD_DIR || path.resolve('/app/frontend/build');
+  const clientDir = path.join(frontendBuildDir, 'client');
+  const serverBuild = path.join(frontendBuildDir, 'server', 'index.js');
+
+  if (!existsSync(serverBuild)) {
+    if (config.nodeEnv === 'production') {
+      throw new Error(`React Router server build not found at ${serverBuild}`);
+    }
+    return;
+  }
+
+  app.use(express.static(clientDir, { immutable: true, maxAge: '1y' }));
+  app.all('*', createRequestHandler({
+    build: () => import(pathToFileURL(serverBuild).href),
+  }));
+};
 
 // Error Handler
 app.use(errorHandler);
