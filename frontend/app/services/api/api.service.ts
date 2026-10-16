@@ -1,8 +1,9 @@
 const getDefaultApiUrl = () => {
+  const apiPath = `${import.meta.env.BASE_URL}api`.replace('//api', '/api');
   if (typeof window === 'undefined') {
-    return import.meta.env.VITE_API_URL || '/kahoot-builder/api';
+    return import.meta.env.VITE_API_URL || apiPath;
   }
-  return `${window.location.origin}${import.meta.env.VITE_API_PATH || '/kahoot-builder/api'}`;
+  return `${window.location.origin}${import.meta.env.VITE_API_PATH || apiPath}`;
 };
 
 const shouldOverrideApiUrl = (apiUrl: string | undefined) => {

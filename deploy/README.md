@@ -1,17 +1,17 @@
 # Producción con Docker
 
 1. Clona el repositorio: `git clone <URL_DEL_REPOSITORIO> kahoot-builder`.
-2. Copia `.env.production.example` como `.env` y rellena los secretos.
-3. Para el dominio actual, conserva `APP_BASE_PATH=/kahoot-builder` y elige el puerto con `APP_PORT=8080`.
+2. Crea `.env` a partir de `backend/.env.example` y rellena los secretos.
+3. Para el dominio nuevo, usa `APP_BASE_PATH=/` y elige el puerto con `APP_PORT=8080`.
 4. Arranca: `docker compose -f docker-compose.prod.yml up -d --build`.
 
 Para actualizar una instalación existente: `git pull` y después `docker compose -f docker-compose.prod.yml up -d --build`.
 
-El proxy publica la web en `https://juacac.ydns.eu/kahoot-builder` y la API bajo el mismo prefijo. Para usar un dominio raíz en el futuro, cambia `APP_BASE_PATH=/`, ajusta `CORS_ORIGIN` y `GOOGLE_CALLBACK_URL`, y vuelve a construir.
+El proxy publica la web en `https://kahoot-builder.jcanas.es` y la API en `/api`. Ajusta `CORS_ORIGIN` y `GOOGLE_CALLBACK_URL` en `.env` y vuelve a construir.
 
-Docker publica un único puerto (`APP_PORT`, por defecto `8080`). Dentro del contenedor la web está en `/` y la API en `/api/`; el Nginx público debe enviar `/kahoot-builder/` a ese puerto eliminando el prefijo.
+Docker publica un único puerto (`APP_PORT`, por defecto `8080`). Dentro del contenedor la web está en `/` y la API en `/api/`; el Nginx público debe enviar el dominio nuevo a ese puerto.
 
-Para un futuro dominio raíz, usa `APP_BASE_PATH=` (vacío), no `/`.
+Para un dominio bajo subruta, puedes usar por ejemplo `APP_BASE_PATH=/kahoot-builder`.
 
 ## Prueba local antes de subirlo
 

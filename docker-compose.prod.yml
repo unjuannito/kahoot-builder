@@ -21,7 +21,7 @@ services:
     build:
       context: ./frontend
       args:
-        APP_BASE_PATH: ${APP_BASE_PATH-/kahoot-builder}
+        APP_BASE_PATH: ${APP_BASE_PATH-/}
     restart: unless-stopped
     environment:
       NODE_ENV: production

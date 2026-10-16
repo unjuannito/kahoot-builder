@@ -2,7 +2,7 @@ import { reactRouter } from "@react-router/dev/vite";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
 
-const appBasePath = process.env.APP_BASE_PATH || "/kahoot-builder";
+const appBasePath = process.env.APP_BASE_PATH ?? "/";
 const normalizedBasePath = appBasePath === "/"
   ? "/"
   : `/${appBasePath.replace(/^\/+|\/+$/g, "")}/`;

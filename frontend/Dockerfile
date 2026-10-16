@@ -1,7 +1,6 @@
 FROM node:24-alpine AS development-dependencies-env
-ARG APP_BASE_PATH=/kahoot-builder
+ARG APP_BASE_PATH=/
 ENV APP_BASE_PATH=$APP_BASE_PATH
-ENV VITE_API_PATH=$APP_BASE_PATH/api
 COPY . /app
 WORKDIR /app
 RUN npm install
@@ -12,9 +11,8 @@ WORKDIR /app
 RUN npm install --omit=dev
 
 FROM node:24-alpine AS build-env
-ARG APP_BASE_PATH=/kahoot-builder
+ARG APP_BASE_PATH=/
 ENV APP_BASE_PATH=$APP_BASE_PATH
-ENV VITE_API_PATH=$APP_BASE_PATH/api
 COPY . /app/
 COPY --from=development-dependencies-env /app/node_modules /app/node_modules
 WORKDIR /app
