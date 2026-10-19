@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, useCallback } from 'react';
 import { authService } from '../services/api/auth.service.js';
+import { AUTH_SESSION_EXPIRED_EVENT } from '../services/api/api.service.js';
 import type { AuthUser, LoginPayload, RegisterPayload } from '../types/auth.types.js';
 
 interface AuthContextType {
@@ -49,6 +50,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     restoreSession();
   }, [restoreSession]);
+
+  useEffect(() => {
+    const handleSessionExpired = () => setUser(null);
+    window.addEventListener(AUTH_SESSION_EXPIRED_EVENT, handleSessionExpired);
+    return () => window.removeEventListener(AUTH_SESSION_EXPIRED_EVENT, handleSessionExpired);
+  }, []);
 
   const login = async (payload: LoginPayload) => {
     const userData = await authService.login(payload);
