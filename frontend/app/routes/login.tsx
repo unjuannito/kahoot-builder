@@ -9,6 +9,7 @@ export function meta({}: Route.MetaArgs) {
   const { t } = useTranslation('common');
   return [
     { title: `${t('app.name')} - ${t('auth.login.title')}` },
+    { name: "robots", content: "noindex,follow" },
     { name: "description", content: t('auth.login.subtitle') },
   ];
 }

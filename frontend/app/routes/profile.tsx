@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 
 export function meta() {
   const { t } = useTranslation('common');
-  return [{ title: t('profile.meta_title') }];
+  return [{ title: t('profile.meta_title') }, { name: 'robots', content: 'noindex,follow' }];
 }
 
 export default function Profile() {

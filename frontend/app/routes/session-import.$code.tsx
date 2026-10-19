@@ -7,7 +7,7 @@ import { kahootService } from '../services/api/kahoot.service.js';
 
 export function meta() {
   const { t } = useTranslation('common');
-  return [{ title: t('session.import_meta_title') }];
+  return [{ title: t('session.import_meta_title') }, { name: 'robots', content: 'noindex,follow' }];
 }
 
 export default function SessionImport() {

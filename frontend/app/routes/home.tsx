@@ -18,9 +18,10 @@ export function loader({ request }: Route.LoaderArgs) {
 export function meta({ loaderData }: Route.MetaArgs) {
   const language = loaderData?.lang === 'es' ? es : en;
   const title = language.home.meta_title;
-  const description = language.home.share_description;
+  const description = language.home.meta_description;
   const image = `${loaderData?.origin ?? ''}/share/home.png?lang=${loaderData?.lang ?? 'en'}`;
-  return [{ title }, { name: 'description', content: description }, { property: 'og:title', content: title }, { property: 'og:description', content: description }, { property: 'og:type', content: 'website' }, { property: 'og:image', content: image }, { property: 'og:image:width', content: '1200' }, { property: 'og:image:height', content: '630' }, { name: 'twitter:card', content: 'summary_large_image' }];
+  const canonical = `${loaderData?.origin ?? ''}${loaderData?.pathname ?? '/'}`;
+  return [{ title }, { name: 'description', content: description }, { tagName: 'link', rel: 'canonical', href: canonical }, { property: 'og:title', content: title }, { property: 'og:description', content: description }, { property: 'og:type', content: 'website' }, { property: 'og:url', content: canonical }, { property: 'og:image', content: image }, { property: 'og:image:width', content: '1200' }, { property: 'og:image:height', content: '630' }, { name: 'twitter:card', content: 'summary_large_image' }];
 }
 
 export default function Home() {
@@ -92,6 +93,19 @@ export default function Home() {
           <Feature icon={<UsersRound />} title={t('home.feature1_title')} text={t('home.feature1_text')} />
           <Feature icon={<Sparkles />} title={t('home.feature2_title')} text={t('home.feature2_text')} />
           <Feature icon={<FileSpreadsheet />} title={t('home.feature3_title')} text={t('home.feature3_text')} />
+        </section>
+        <section className="border-t border-border py-12">
+          <h2 className="max-w-2xl text-3xl font-black tracking-tight text-foreground">{t('home.how_title')}</h2>
+          <p className="mt-3 max-w-2xl leading-7 text-muted-foreground">{t('home.how_intro')}</p>
+          <ol className="mt-8 grid gap-5 sm:grid-cols-3">
+            {[1, 2, 3].map((step) => (
+              <li key={step} className="rounded-2xl border border-border bg-card/70 p-5">
+                <span className="text-sm font-black text-primary">{String(step).padStart(2, '0')}</span>
+                <h3 className="mt-3 text-lg font-bold text-foreground">{t(`home.step${step}_title`)}</h3>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">{t(`home.step${step}_text`)}</p>
+              </li>
+            ))}
+          </ol>
         </section>
       </div>
     </main>

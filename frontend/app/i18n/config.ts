@@ -13,7 +13,7 @@ i18n
       en: { common: enTranslation },
       es: { common: esTranslation }
     },
-    fallbackLng: 'en',
+    fallbackLng: 'es',
     defaultNS: 'common',
     interpolation: {
       escapeValue: false

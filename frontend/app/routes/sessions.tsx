@@ -10,7 +10,7 @@ import logo from '../assets/logo_kb.svg';
 
 export function meta() {
   const { t } = useTranslation('common');
-  return [{ title: t('sessions.meta_title') }];
+  return [{ title: t('sessions.meta_title') }, { name: 'robots', content: 'noindex,follow' }];
 }
 
 export default function Sessions() {

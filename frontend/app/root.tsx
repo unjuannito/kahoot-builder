@@ -64,6 +64,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="google-site-verification" content="7mTnHXL8CC9_FRsPkkdDtvn3YwlTlfX1KUNR7iO_ASU" />
         <link rel="icon" href={logo} type="image/svg+xml" />
         <link rel="shortcut icon" href={logo} />
         <Meta />

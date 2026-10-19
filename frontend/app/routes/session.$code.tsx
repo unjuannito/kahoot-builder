@@ -23,7 +23,7 @@ export function meta({ params, loaderData }: Route.MetaArgs) {
   const title = language.session.meta_title.replace('{{code}}', code);
   const description = language.session.share_description.replace('{{code}}', code);
   const image = `${loaderData?.origin ?? ''}/share/session/${encodeURIComponent(code)}.png?lang=${loaderData?.lang ?? 'en'}`;
-  return [{ title }, { name: 'description', content: description }, { property: 'og:title', content: title }, { property: 'og:description', content: description }, { property: 'og:type', content: 'website' }, { property: 'og:image', content: image }, { property: 'og:image:width', content: '1200' }, { property: 'og:image:height', content: '630' }, { name: 'twitter:card', content: 'summary_large_image' }];
+  return [{ title }, { name: 'robots', content: 'noindex,follow' }, { name: 'description', content: description }, { property: 'og:title', content: title }, { property: 'og:description', content: description }, { property: 'og:type', content: 'website' }, { property: 'og:image', content: image }, { property: 'og:image:width', content: '1200' }, { property: 'og:image:height', content: '630' }, { name: 'twitter:card', content: 'summary_large_image' }];
 }
 
 function QuestionCard({ question, index, t, onDelete, onEdit, isOwner }: { question: Question; index: number; t: (key: string) => string; onDelete: (id: string) => void; onEdit: (question: Question) => void; isOwner: boolean }) {
@@ -67,7 +67,7 @@ function QuestionCard({ question, index, t, onDelete, onEdit, isOwner }: { quest
 }
 
 export default function Session() {
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
   const { code = '' } = useParams();
   const navigate = useNavigate();
   const { user, isLoading: isAuthLoading } = useAuth();
@@ -176,7 +176,10 @@ export default function Session() {
   };
 
   const shareSession = async () => {
-    const url = window.location.href;
+    const shareUrl = new URL(window.location.href);
+    const language = (i18n.resolvedLanguage || i18n.language || 'es').toLowerCase().startsWith('en') ? 'en' : 'es';
+    shareUrl.searchParams.set('lang', language);
+    const url = shareUrl.toString();
     const isMobileApple = /iPhone|iPad|iPod/i.test(navigator.userAgent)
       || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     const isMobileAndroid = /Android/i.test(navigator.userAgent);
