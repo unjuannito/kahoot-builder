@@ -21,7 +21,8 @@ FROM node:22-alpine AS production
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
-RUN apk add --no-cache dumb-init python3 make g++ linux-headers
+RUN apk add --no-cache dumb-init python3 make g++ linux-headers fontconfig ttf-dejavu \
+    && fc-cache -f
 
 COPY backend/package*.json ./backend/
 RUN cd backend && npm ci --omit=dev && npm cache clean --force

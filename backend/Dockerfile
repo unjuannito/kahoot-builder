@@ -12,7 +12,10 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 COPY --from=build /app/dist ./dist
-RUN mkdir -p /data && chown -R node:node /app /data
+RUN apk add --no-cache fontconfig ttf-dejavu \
+    && fc-cache -f \
+    && mkdir -p /data \
+    && chown -R node:node /app /data
 USER node
 EXPOSE 3000
 CMD ["npm", "run", "start"]
