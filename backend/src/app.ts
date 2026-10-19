@@ -6,6 +6,7 @@ import rateLimit from 'express-rate-limit';
 import { config } from './config/index.js';
 import authRoutes from './routes/auth.routes.js';
 import questionRoutes from './routes/question.routes.js';
+import shareRoutes from './routes/share.routes.js';
 import { errorHandler } from './middleware/error.handler.js';
 import { apiRateLimiter } from './middleware/rate-limiter.js';
 import path from 'path';
@@ -64,6 +65,7 @@ app.get('/api', (_req, res) => {
 });
 app.use('/api/auth', authRoutes);
 app.use('/api', questionRoutes);
+app.use('/share', shareRoutes);
 
 // React Router's production build is the frontend server. The API and SSR
 // frontend intentionally share this Express instance and public port.

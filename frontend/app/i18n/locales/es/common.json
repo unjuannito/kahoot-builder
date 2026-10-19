@@ -5,6 +5,7 @@
   "home": {
     "meta_title": "Kahoot Builder",
     "meta_description": "Crea quizzes de Kahoot con tu equipo.",
+    "share_description": "Crea una sala, comparte el código y reúne preguntas divertidas para tu próximo Kahoot.",
     "tagline": "Kahoot, en equipo",
     "headline": "Las mejores preguntas nacen",
     "headline_highlight": "entre todos.",
@@ -151,6 +152,7 @@
   },
   "session": {
     "meta_title": "Sala {{code}} — Kahoot Builder",
+    "share_description": "Únete a la sala {{code}} y aporta tus preguntas.",
     "checking_account": "Comprobando tu cuenta…",
     "loading": "…",
     "room_not_found_title": "Sala no encontrada",

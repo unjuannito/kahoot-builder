@@ -6,10 +6,21 @@ import { kahootService } from '../services/api/kahoot.service.js';
 import { useAuth } from '../hooks/useAuth.js';
 import { useTranslation } from 'react-i18next';
 import logo from '../assets/logo_kb.svg';
+import type { Route } from './+types/home';
+import { getSharePageContext } from '../lib/share-page';
+import es from '../i18n/locales/es/common.json';
+import en from '../i18n/locales/en/common.json';
 
-export function meta() {
-  const { t } = useTranslation('common');
-  return [{ title: t('home.meta_title') }, { name: 'description', content: t('home.meta_description') }];
+export function loader({ request }: Route.LoaderArgs) {
+  return getSharePageContext(request);
+}
+
+export function meta({ loaderData }: Route.MetaArgs) {
+  const language = loaderData?.lang === 'es' ? es : en;
+  const title = language.home.meta_title;
+  const description = language.home.share_description;
+  const image = `${loaderData?.origin ?? ''}/share/home.png?lang=${loaderData?.lang ?? 'en'}`;
+  return [{ title }, { name: 'description', content: description }, { property: 'og:title', content: title }, { property: 'og:description', content: description }, { property: 'og:type', content: 'website' }, { property: 'og:image', content: image }, { property: 'og:image:width', content: '1200' }, { property: 'og:image:height', content: '630' }, { name: 'twitter:card', content: 'summary_large_image' }];
 }
 
 export default function Home() {

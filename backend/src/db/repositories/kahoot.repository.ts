@@ -53,6 +53,19 @@ export const KahootRepository = {
     return getDB().prepare('SELECT * FROM sessions WHERE code = ?').get(code) as KahootSession | undefined;
   },
 
+  countQuestionsBySession(sessionId: string): number {
+    const row = getDB().prepare('SELECT COUNT(*) AS count FROM questions WHERE session_id = ?').get(sessionId) as { count: number };
+    return row.count;
+  },
+
+  findSessionOwnerName(sessionId: string): string | undefined {
+    const row = getDB().prepare(`SELECT u.name FROM session_users su
+      JOIN users u ON u.id = su.user_id
+      WHERE su.session_id = ? AND su.is_owner = 1 AND su.left_at IS NULL
+      ORDER BY su.joined_at LIMIT 1`).get(sessionId) as { name: string } | undefined;
+    return row?.name;
+  },
+
   createQuestion(input: CreateQuestionInput): Question {
     const id = randomUUID();
     getDB().prepare(`INSERT INTO questions

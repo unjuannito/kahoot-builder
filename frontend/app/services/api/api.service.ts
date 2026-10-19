@@ -20,6 +20,18 @@ export const getApiBaseUrl = () =>
     : import.meta.env.VITE_API_URL || getDefaultApiUrl();
 
 import type { ErrorCode } from '../../types/auth.types';
+import type { AuthResponse } from '../../types/auth.types';
+
+export const AUTH_SESSION_EXPIRED_EVENT = 'auth-session-expired';
+let refreshPromise: Promise<AuthResponse> | null = null;
+
+function refreshAccess(): Promise<AuthResponse> {
+  if (!refreshPromise) {
+    refreshPromise = request<AuthResponse>('/auth/refresh', { method: 'POST' }, false)
+      .finally(() => { refreshPromise = null; });
+  }
+  return refreshPromise;
+}
 
 export class ApiError extends Error {
   constructor(
@@ -34,7 +46,11 @@ export class ApiError extends Error {
   }
 }
 
-async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+async function request<T>(path: string, options: RequestInit = {}, retryAfterRefresh = true): Promise<T> {
+  if (path === '/auth/refresh' && retryAfterRefresh) {
+    return refreshAccess() as Promise<T>;
+  }
+
   const BASE_URL = getApiBaseUrl();
   const url = `${BASE_URL}${path}`;
   
@@ -57,6 +73,16 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
         ? `No se pudo conectar al backend (${error.message}). Revisa que el servidor de API esté corriendo y que la URL de ${url} sea accesible desde este dispositivo.`
         : `No se pudo conectar al backend. Revisa tu conexión y la URL de ${url}.`;
     throw new ApiError(0, message, undefined, undefined, { url, originalError: error });
+  }
+
+  if (response.status === 401 && retryAfterRefresh && path !== '/auth/login' && path !== '/auth/register') {
+    const refreshed = await refreshAccess();
+    if (refreshed.authenticated) {
+      return request<T>(path, options, false);
+    }
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event(AUTH_SESSION_EXPIRED_EVENT));
+    }
   }
 
   if (response.status === 204) {
