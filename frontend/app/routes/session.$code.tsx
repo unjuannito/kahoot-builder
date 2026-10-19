@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
-import { ArrowLeft, Check, ChevronDown, LoaderCircle, Plus, Copy, Timer, UsersRound, Edit2, Trash2, X, LogOut } from 'lucide-react';
+import { ArrowLeft, ArrowRightLeft, Check, ChevronDown, LoaderCircle, Plus, Copy, Share2, Timer, UsersRound, Edit2, Trash2, X, LogOut } from 'lucide-react';
 import { toast } from 'sonner';
 import { KAHOOT_TIMES, type Question, type KahootSession, type SessionVisibility } from '../types/kahoot.types.js';
 import { kahootService } from '../services/api/kahoot.service.js';
@@ -175,6 +175,30 @@ export default function Session() {
     }
   };
 
+  const shareSession = async () => {
+    const url = window.location.href;
+    const isMobileApple = /iPhone|iPad|iPod/i.test(navigator.userAgent)
+      || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const isMobileAndroid = /Android/i.test(navigator.userAgent);
+
+    if ((isMobileApple || isMobileAndroid) && navigator.share) {
+      try {
+        await navigator.share({ title: document.title, text: t('session.share_description').replace('{{code}}', code.toUpperCase()), url });
+      } catch (error) {
+        // Dismissing the native share sheet is an expected user action.
+        if (error instanceof Error && error.name !== 'AbortError') toast.error(t('session.error_share'));
+      }
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success(t('session.copy_link'));
+    } catch {
+      toast.error(t('session.error_share'));
+    }
+  };
+
   const handleVisibilityChange = async (visibility: SessionVisibility) => {
     if (!session?.is_owner) return;
     try {
@@ -230,23 +254,31 @@ export default function Session() {
 
   return <main className="min-h-screen bg-background flex flex-col lg:h-screen">
     <header className="border-b border-border bg-card/80 backdrop-blur shrink-0">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-8">
-        <Link to="/" className="flex items-center gap-2 text-sm font-bold text-muted-foreground hover:text-foreground">
+      <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-x-4 gap-y-3 px-5 py-4 sm:px-8">
+        <Link to="/" className="order-1 flex items-center gap-2 text-sm font-bold text-muted-foreground hover:text-foreground">
           <ArrowLeft size={17} /> {t('session.back_home')}
         </Link>
-        <div className="text-center">
+        <div className="order-3 flex w-full items-center justify-between rounded-2xl border border-border bg-background/70 px-3 py-2 sm:order-2 sm:w-auto sm:justify-center sm:gap-3 sm:border-0 sm:bg-transparent sm:p-0">
+          <div className="text-left sm:text-center">
           <p className="text-[10px] font-bold uppercase tracking-[.2em] text-muted-foreground">{t('session.room_code_label')}</p>
           <p className="text-xl font-black tracking-widest text-primary">{code.toUpperCase()}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <button onClick={() => { navigator.clipboard?.writeText(code.toUpperCase()); toast.success(t('session.copy_code')); }} className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-border bg-card px-3 text-sm font-bold text-muted-foreground hover:bg-muted" aria-label={t('session.copy_code')} title={t('session.copy_code')}>
+              <Copy size={17} /><span className="hidden md:inline">{t('session.copy_code_action')}</span>
+            </button>
+            <button onClick={shareSession} className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-primary px-3 text-sm font-bold text-white hover:bg-primary/90" aria-label={t('session.share_link')} title={t('session.share_link')}>
+              <Share2 size={17} /><span className="whitespace-nowrap">{t('session.share_action')}</span>
+            </button>
+          </div>
         </div>
-        <div className="flex gap-2">
-          <button onClick={leaveSession} className="inline-flex items-center gap-2 rounded-xl border border-border px-3 text-sm font-bold text-muted-foreground hover:bg-muted hover:text-foreground">
+        <div className="order-2 ml-auto flex gap-2 sm:order-3 sm:ml-0">
+          <button onClick={leaveSession} className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-border px-3 text-sm font-bold text-muted-foreground hover:bg-muted hover:text-foreground" aria-label={t('session.exit')} title={t('session.exit')}>
             <LogOut size={16} /> <span className="hidden sm:inline">{t('session.exit')}</span>
           </button>
-          <button onClick={() => { navigator.clipboard?.writeText(code.toUpperCase()); toast.success(t('session.copy_code')); }} className="grid size-10 place-items-center rounded-xl border border-border text-muted-foreground hover:bg-muted" aria-label={t('session.room_code_label')}>
-            <Copy size={17} />
-          </button>
-          <Link to={`/session/${code}/import`} className="inline-flex items-center gap-2 rounded-xl bg-ink px-3 text-sm font-bold text-white">
-            <ArrowLeft size={16} className="rotate-180" />
+          <Link to={`/session/${code}/import`} aria-label={t('session.import')} title={t('session.import')} className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-ink px-3 text-sm font-bold text-white">
+            <ArrowRightLeft size={17} />
+            <span className="sm:hidden">{t('session.import_short')}</span>
             <span className="hidden sm:inline">{t('session.import')}</span>
           </Link>
         </div>
