@@ -6,12 +6,24 @@ import { KAHOOT_TIMES, type Question, type KahootSession, type SessionVisibility
 import { kahootService } from '../services/api/kahoot.service.js';
 import { useAuth } from '../hooks/useAuth.js';
 import { useTranslation } from 'react-i18next';
+import type { Route } from './+types/session.$code';
+import { getSharePageContext } from '../lib/share-page';
+import es from '../i18n/locales/es/common.json';
+import en from '../i18n/locales/en/common.json';
 
 const blank = { question: '', option1: '', option2: '', option3: '', option4: '', time: 20, correct: '1' };
 
-export function meta({ params }: { params: { code?: string } }) {
-  const { t } = useTranslation('common');
-  return [{ title: t('session.meta_title', { code: params.code ?? '' }) }];
+export function loader({ request }: Route.LoaderArgs) {
+  return getSharePageContext(request);
+}
+
+export function meta({ params, loaderData }: Route.MetaArgs) {
+  const language = loaderData?.lang === 'es' ? es : en;
+  const code = params.code ?? '';
+  const title = language.session.meta_title.replace('{{code}}', code);
+  const description = language.session.share_description.replace('{{code}}', code);
+  const image = `${loaderData?.origin ?? ''}/share/session/${encodeURIComponent(code)}.png?lang=${loaderData?.lang ?? 'en'}`;
+  return [{ title }, { name: 'description', content: description }, { property: 'og:title', content: title }, { property: 'og:description', content: description }, { property: 'og:type', content: 'website' }, { property: 'og:image', content: image }, { property: 'og:image:width', content: '1200' }, { property: 'og:image:height', content: '630' }, { name: 'twitter:card', content: 'summary_large_image' }];
 }
 
 function QuestionCard({ question, index, t, onDelete, onEdit, isOwner }: { question: Question; index: number; t: (key: string) => string; onDelete: (id: string) => void; onEdit: (question: Question) => void; isOwner: boolean }) {

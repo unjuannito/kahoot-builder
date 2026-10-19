@@ -5,6 +5,7 @@
   "home": {
     "meta_title": "Kahoot Builder",
     "meta_description": "Create Kahoot quizzes with your team.",
+    "share_description": "Create a room, share the code, and gather fun questions for your next Kahoot.",
     "tagline": "Kahoot, together",
     "headline": "The best questions come from",
     "headline_highlight": "everyone.",
@@ -151,6 +152,7 @@
   },
   "session": {
     "meta_title": "Room {{code}} — Kahoot Builder",
+    "share_description": "Join room {{code}} and add your questions.",
     "checking_account": "Checking your account…",
     "loading": "…",
     "room_not_found_title": "Room not found",
